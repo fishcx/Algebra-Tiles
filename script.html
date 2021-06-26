@@ -1,0 +1,255 @@
+<script>
+	$( function() {
+    var idNum = 0;
+    var erasing = false;
+    $('.area').hide();
+    resizeItems();
+    var activeChip = "";
+    
+    $(window).on('resize', function(){
+      resizeItems();
+    });
+    
+    
+    function resizeItems(){
+       if($(window).width() < 600){
+          //$('#bottom-menu').show();
+          //$('#top-menu').hide();
+          //$("#new-problem").val("New");
+          //$("#show-answer").val("Show");
+          $('#box').css("width",$(window).width()-60);
+          $('.x-squared.clone').css("height","100px");
+          $('.x-squared.clone').css("width","100px");
+          $('.x-squared.clone').css("padding-top","35px");
+          $('.x-squared.clone').css("font-size","16px");
+       } else{
+          //$('#top-menu').show();
+          //$('#bottom-menu').hide();
+          $('#box').css("width",$(window).width()-85);
+          $('.x-squared.clone').css("height","150px");
+          $('.x-squared.clone').css("width","150px");
+          $('.x-squared.clone').css("padding-top","60px");
+          $('.x-squared.clone').css("font-size","22px");
+       }
+    
+    }
+    
+    $(".draggable").draggable({
+       revert: 'invalid',
+       appendTo: '#box',
+       scroll: false
+    });
+       
+    $(".in-menu").each( function(elem) {
+       $(this).draggable("option", "helper", 'clone');
+
+       // can't use .width() and .height() before images load
+       var width = parseInt($(this).css('width'));
+       var height = parseInt($(this).css('height'));
+       $(this).draggable("option", "cursorAt",
+                            {'top': height/2, 'left': width/2});
+    });
+    
+    $(".in-menu").on("click",function(event) {
+              
+         resetPointer();
+         resetEraser();
+         // reset activeChip to be the new chip that was clicked on
+         activeChip = $(this).attr('id'); 
+
+         $(this).addClass('selected');
+
+    });
+    
+    $( "#box" ).droppable({
+      drop: function(event, ui) {
+          var clone = cloneChip(ui.draggable,this,0);   
+          //clone.on("click",eraseChip);
+          clone.on("click",function(event) {
+              event.stopPropagation();
+              resetPointer();
+
+             if(erasing){  $(this).remove(); }
+            else{
+            
+              // reset activeChip to be the new chip that was clicked on
+              activeChip = $(this).attr('id'); 
+              $(this).addClass('selected');
+                
+            }
+          });
+       }
+    });
+    
+    
+    $( "#box" ).on("click",createByClick);
+
+    $( "#varLetter" ).on("change",setVar);
+
+    function setVar(){
+
+       var letter = $('#varLetter').val().toString();
+       $('#x-squared-source').html("\\("+letter+"^2\\)");
+       $('#x-chip-source-top').html("\\("+letter+"\\)"); 
+       $('#x-chip-source-left').html("\\("+letter+"\\)");
+       $('#neg-x-squared-source').html("\\(-"+letter+"^2\\)"); 
+       $('#neg-x-chip-source').html("\\(-"+letter+"\\)"); 
+       $('#neg-x-chip-source-left').html("\\(-"+letter+"\\)");
+       renderMathInElement(document.body);   
+       
+    }
+
+    function createByClick(){
+    
+        if(activeChip != ""){
+          var clone = cloneChip(activeChip,this,0); 
+          clone.on("click",function(event) {
+              event.stopPropagation();
+              resetPointer();
+     
+             if(erasing){   $(this).remove();  }
+             else{
+                
+              // reset activeChip to be the new chip that was clicked on
+              activeChip = $(this).attr('id'); 
+
+             $(this).addClass('selected');
+            
+            }
+          });
+        }
+    }
+    
+    function cloneChip(sourceChip,div,change){
+
+        if((typeof sourceChip) == "string"){  sourceChip = $("#"+sourceChip); }
+        
+        var clone = sourceChip.clone();
+        
+        // resize if x squared chip
+        if(sourceChip.hasClass('x-squared') && sourceChip.hasClass('in-menu')){
+            
+            if($(window).width() < 600){
+               clone.css("height","100px");
+               clone.css("width","100px");
+               clone.css("padding-top","35px");
+            }
+            else{
+               clone.css("height","150px");
+               clone.css("width","150px");
+               clone.css("padding-top","60px");
+            }
+        }
+        
+        // make sure you append to the div BEFORE finding the width and height
+        clone.appendTo( div );
+        
+        var width = parseInt(clone.width());
+        var height = parseInt(clone.height());
+
+        if(sourceChip.hasClass("in-menu")){ 
+           // reset the eraser if dragging in new tiles from menu
+           resetEraser();
+           idNum++;
+           clone.attr('id','chip-'+idNum);
+        } 
+        else{
+           // remove previous location of chip
+           sourceChip.remove(); 
+        }
+        
+        clone.removeClass("in-menu"); 
+        clone.addClass("clone"); 
+        clone.css("left", ""); // I don't think this is necessary to remove (doesn't make a difference) but it shouldn't be needed in the field
+        
+        clone.draggable({
+           revert: 'invalid',
+           appendTo: '#box',
+           scroll: false
+         }); // make the clone a draggable object
+        
+        // this allows for accuracy in the new dropped location when a new chip is moved around (doesn't "snap" to a grid, drops exactly where it was)
+        clone.draggable("option", "cursorAt",
+                            {'top': height/2, 'left': width/2});
+        
+        clone.offset({'top':event.pageY-height/2 ,
+                      'left':event.pageX-width/2+change });
+                      
+        return clone;
+         
+    }
+    
+    function resetPointer(){
+    
+         // remove selected from all items
+         $('.chip').removeClass('selected');
+         
+    }
+    
+    function resetEraser(){
+    
+         // reset erasing
+         $('#erase').css("background-color","white");
+         $('#erase').css("color","black");
+         $('.eraserPic').attr("fill", "white");
+         $('.eraserPic').attr("stroke", "black");
+         $('.clone').css('cursor','');
+         erasing = false;
+         
+    }
+    
+    $('#reset').click(function() {
+    
+         // NOTE - alert confirmation message does not work when embedded in Google sites
+         $('.clone').remove();
+         resetEraser();
+         resetPointer();
+         activeChip = "";
+        
+    });
+    
+    $('#erase').click(function() {
+         
+         // turn on erasing
+         if(erasing == false){
+            resetPointer();
+            activeChip = "";
+            $('#erase').css("background-color","#1F1F69");
+            $('#erase').css("color","white");
+            $('.eraserPic').attr("fill", "#1F1F69");
+            $('.eraserPic').attr("stroke", "white");
+            $('.clone').css('cursor','crosshair');
+            erasing = true;
+         }
+        
+         // turn off erasing
+         else {
+            resetEraser();
+         }
+         
+    });
+    
+     $('#area-button').click(function() {
+         
+         if($('#area-box-top').is(":visible")){
+         
+            $('#area-button').css("background-color","white");
+            $('#area-button').css("color","black");
+            $('.areaPic').attr("fill", "white");
+            $('.areaPic').attr("stroke", "black");
+            $('.clone').css('cursor','crosshair');
+            $('.area').hide();
+         }
+        
+         else {
+            $('#area-button').css("background-color","#1F1F69");
+            $('#area-button').css("color","white");
+            $('.areaPic').attr("fill", "#1F1F69");
+            $('.areaPic').attr("stroke", "white");
+            $('.area').show();
+         }
+         
+    });
+       
+  } );
+</script>

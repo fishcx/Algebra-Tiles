@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta name="author" content="Tom Fisher FishMath.com">
+    <title>Algebra Tiles</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://drive.google.com/uc?export=view&id=1hHnc5a1nl-FpDmmVsh2HDOi5eHhIAzgn">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <?!= include('touchpunch'); ?>  <!-- this allows for draggable on mobile -->
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+</head>
+<body>
+<div id="items-top"> 
+   <span id="x-squared-source" class="x-squared chip draggable in-menu">\(x^2\)</span>
+   <span id="x-chip-source-top" class="x-chip x-top chip draggable in-menu">\(x\)</span>
+   <span id="one-chip-source" class="one-chip chip draggable in-menu">\(1\)</span>
+   <span id="neg-x-squared-source" class="x-squared red-top chip draggable in-menu">\(-x^2\)</span>
+   <span id="neg-x-chip-source" class="x-chip  x-top red-top chip draggable in-menu">\(-x\)</span>
+   <span id="neg-one-chip-source" class="one-chip red-top chip draggable in-menu">\(-1\)</span>
+   <span id="top-menu">
+   <span id="erase" class="button" title="Erase"><svg xmlns="http://www.w3.org/2000/svg" style="padding-top: 5px;" class="icon icon-tabler icon-tabler-eraser" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <path class="eraserPic" d="M19 19h-11l-4 -4a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9 9" />
+      <path class="eraserPic" d="M18 12.3l-6.3 -6.3" />
+   </svg></span>
+   <span id="area-button" class="button" title="Area"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-frame" style="padding-top: 5px;" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line class="areaPic" x1="4" y1="7" x2="20" y2="7" />
+      <line class="areaPic" x1="7" y1="4" x2="7" y2="20" />
+   </svg>
+   </span>
+   <span id="varSpan">
+     <select name="varLetter" id="varLetter">
+        <option value="x">x</option>
+        <option value="y">y</option>
+        <option value="z">z</option>
+        <option value="a">a</option>
+        <option value="b">b</option>
+        <option value="c">c</option>
+     </select>
+   </span>
+   <span id="reset" class="button" title="Reset board"><svg xmlns="http://www.w3.org/2000/svg" style="padding-top: 5px;" class="icon icon-tabler icon-tabler-refresh" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -5v5h5" />
+      <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 5v-5h-5" />
+   </svg></span>
+   </span>
+</div>
+<div id="items-left"> 
+   <span id="x-chip-source-left" class="x-chip x-left chip draggable in-menu">\(x\)</span>
+   <span id="neg-x-chip-source-left" class="x-chip x-left red-left chip draggable in-menu">\(-x\)</span>
+</div>
+<!--<div id="problembox" class="ui-widget-content">
+   <input type="button" value="New Problem" id="new-problem" class="btn btn-main">
+   <span id="problem"></span>
+   <input type="button" value="Show Answer" id="show-answer" class="btn btn-main">
+   <span id="answer" name=""></span>
+   <input type="text" id="answer-holder" name="answer-holder" style="display:none;">
+</div>-->
+<div id="box" class="ui-widget-content droppable">
+  <div id="area-box-top" class="area">
+   <p>Length</p>
+</div>
+<div id="area-box-left" class="area width">
+   <p>Width</p>
+</div>
+<div id="area-box-middle" class="area">
+   <p>Area</p>
+</div>
+</div>
+<!--
+<div id="bottom-menu">
+   <span id="erase2" class="erase">Remove<svg xmlns="http://www.w3.org/2000/svg" style="padding-top: 5px;" class="icon icon-tabler icon-tabler-eraser" width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <path class="eraserPic" d="M19 19h-11l-4 -4a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9 9" />
+      <path class="eraserPic" d="M18 12.3l-6.3 -6.3" />
+   </svg></span>
+   <span id="reset2" class="reset">Reset<svg xmlns="http://www.w3.org/2000/svg" style="padding-top: 5px;" class="icon icon-tabler icon-tabler-refresh" width="22" height="22" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -5v5h5" />
+      <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 5v-5h-5" />
+   </svg></span>
+</div>-->
+</body>
+</html>
+<?!= include('script'); ?> 
+<?!= include('customCSS'); ?> 
+<?!= include('helperscript'); ?> 
